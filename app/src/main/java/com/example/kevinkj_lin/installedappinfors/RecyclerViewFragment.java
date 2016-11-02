@@ -7,9 +7,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-
+/**
+ *該 Fragment 僅放一個 RecyclerView
+ */
 public class RecyclerViewFragment extends Fragment {
-
 
     public RecyclerViewFragment() {
         // Required empty public constructor
