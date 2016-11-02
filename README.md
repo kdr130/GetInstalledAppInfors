@@ -1,4 +1,4 @@
-# GetInstalledAppInfors
+# InstalledAppInfors
 
 使用 RecyclerView
 列出手機內所有 app name, icon，項目之間使用 divider 分隔
