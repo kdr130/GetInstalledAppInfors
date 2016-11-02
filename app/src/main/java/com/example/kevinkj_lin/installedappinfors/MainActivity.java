@@ -1,6 +1,7 @@
 package com.example.kevinkj_lin.installedappinfors;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
@@ -8,8 +9,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -73,20 +74,38 @@ public class MainActivity extends AppCompatActivity {
         int permissionCheck = ContextCompat.checkSelfPermission(this,  Manifest.permission.WRITE_EXTERNAL_STORAGE);
         // 尚未取得寫入權限
         if ( PackageManager.PERMISSION_GRANTED !=  permissionCheck) {
-            // 若使用者曾 拒絕同意權限
+            // 若使用者曾經 拒絕權限請求
             // 則 shouldShowRequestPermissionRationale 會 return true
             // 因此可能就需要解釋一下為什麼需要這個權限
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                Log.d("kkkk","saveToSdPermissionCheck: shouldShowRequestPermissionRationale return true");
-                
-                // Show an expanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
+                // 顯示 AlertDialog 說明要求這個權限的原因
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle(R.string.alert_title)
+                        .setIcon(R.drawable.ic_dialog_alert)
+                        .setMessage(R.string.alert_msg)
+                        .setPositiveButton(R.string.text_btYes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                                // 再請求權限
+                                ActivityCompat.requestPermissions(MainActivity.this,
+                                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                        MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+
+                            }
+                        })
+                        .setNegativeButton(R.string.text_btNo, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .create()
+                        .show();
 
             } else {
-                // 表示是第一次安裝此 App，所以不需要加上解釋
+                // 表示尚未詢問過，所以不需要加上原因解釋
                 // 直接請求即可
-                Log.d("kkkk", "saveToSdPermissionCheck: shouldShowRequestPermissionRationale return false");
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                         MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
@@ -99,14 +118,10 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE:{
-                // If request is cancelled, the result arrays are empty.
+                // 若 取消請求 則 grantResults
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.d("kkkk", "onRequestPermissionsResult: PERMISSION_GRANTED");
-                } else {
-                    Log.d("kkkk", "onRequestPermissionsResult: PERMISSION_DENIED");
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
+                    // 可將資料儲存至外部儲存裝置
                 }
                 return;
             }
