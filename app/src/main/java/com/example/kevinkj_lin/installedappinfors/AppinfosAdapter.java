@@ -2,6 +2,7 @@ package com.example.kevinkj_lin.installedappinfors;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,9 +19,24 @@ public class AppinfosAdapter extends RecyclerView.Adapter<AppinfosAdapter.ViewHo
 
         public ViewHolder(View itemView){
             super(itemView);
+
             appNameTextView = (TextView) itemView.findViewById(R.id.tv_name);
             appIconTextView = (ImageView) itemView.findViewById(R.id.iv_icon);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.e("AppinfosAdapter ", "App Name："+ appNameTextView.getText());
+                }
+            });
         }
+        /*
+        @Override
+        public void onClick(View view) {
+            Log.d(TAG, "onClick: ");
+            Toast.makeText(view.getContext(), "Click ", Toast.LENGTH_SHORT).show();
+        }
+        */
     }
 
     private List<AppInfo> mAppInfos;
