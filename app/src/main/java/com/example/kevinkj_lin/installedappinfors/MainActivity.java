@@ -22,6 +22,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Scanner;
 
 public class MainActivity extends AppCompatActivity {
     private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 1;
@@ -61,6 +62,10 @@ public class MainActivity extends AppCompatActivity {
             case R.id.save:
                 saveAppInfosToSD();
                 break;
+            case R.id.read:
+                File dir = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
+                readAppInfoFromSd(dir, "AppInfos");
+                break;
             default:
                 break;
         }
@@ -72,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         if ( mediaMounted() ) {
             saveToSdPermissionCheck();
         } else {
-            Toast.makeText(this, "外部儲存裝置目前無法寫入或無法使用", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.cannot_use_storage, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -120,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
             }
         } else {  // 已取得寫入權限
             File dir = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
-            saveFile(dir);
+            saveFile(dir, "AppInfos");
         }
     }
 
@@ -138,45 +143,39 @@ public class MainActivity extends AppCompatActivity {
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // 將資料儲存至 私有外部公共 路徑
                     File dir = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
-                    saveFile(dir);
+                    saveFile(dir, "AppInfos");
                 }
                 return;
             }
         }
     }
 
-    private void saveFile(File dir) {
+    private void saveFile(File dir, String fileName) {
         OutputStream os = null;
-        String fileName = "AppInfos";
-        List<AppInfo> list = AppInfo.generateSampleList(getPackageManager());
 
         try {
             // 檢查目錄是否存在
             if (!dir.exists()) {
                 // 建立目錄
                 if (!dir.mkdirs()) {
-                    Toast.makeText(this, "無法建立目錄", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.cannot_make_dir, Toast.LENGTH_SHORT).show();
                     return;
                 }
             }
-
+            List<AppInfo> list = AppInfo.generateSampleList(getPackageManager());
             File file = new File(dir, fileName);
             os = new FileOutputStream(file);
-
             StringBuilder sb = new StringBuilder();
 
             for ( AppInfo info : list ) {
                 //os.write(info.getName().getBytes());
                 sb.append(info.getName()+"\n");
             }
-
             os.write(sb.toString().getBytes());
 
-            Toast.makeText(this, "儲存完畢，路徑為: " + dir, Toast.LENGTH_LONG).show();
-
+            Toast.makeText(this, getResources().getString(R.string.save_success) + dir, Toast.LENGTH_LONG).show();
         } catch (IOException e) {
             Log.e(TAG, e.toString());
-
         } finally {
             try {
                 if (os != null) {
@@ -190,7 +189,25 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void readAppInfoFromSd(File dir, String fileName) {
+        if ( !mediaMounted() ) {
+            Toast.makeText(this, R.string.cannot_use_storage, Toast.LENGTH_SHORT).show();
+        }
+        try{
+            File file = new File(dir, fileName);
+            if ( !file.exists() ) {
+                Toast.makeText(this, R.string.never_save, Toast.LENGTH_SHORT).show();
+                return;
+            }
 
+            // \\Z 是直接讀到 FILE 的結束 的 pattern
+            String fileContent = new Scanner(file).useDelimiter("\\Z").next();
+            Toast.makeText(this, getResources().getString(R.string.read_success) + fileContent, Toast.LENGTH_LONG).show();
 
+        } catch (IOException e) {
+            Log.e(TAG, e.toString());
+        }
+
+    }
 }
 
