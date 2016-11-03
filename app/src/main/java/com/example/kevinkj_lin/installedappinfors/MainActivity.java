@@ -11,13 +11,21 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
     private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 1;
+    private final String TAG = "InstalledAppInfos";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,8 +68,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    public void saveAppInfosToSD(){
-        //Toast.makeText(this, "click", Toast.LENGTH_SHORT).show();
+    public void saveAppInfosToSD() {
         if ( mediaMounted() ) {
             saveToSdPermissionCheck();
         } else {
@@ -111,7 +118,15 @@ public class MainActivity extends AppCompatActivity {
                         MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
 
             }
+        } else {  // 已取得寫入權限
+            File dir = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
+            saveFile(dir);
         }
+    }
+
+    private boolean mediaMounted() {
+        String state = Environment.getExternalStorageState();
+        return state.equals(Environment.MEDIA_MOUNTED);
     }
 
     @Override
@@ -121,17 +136,61 @@ public class MainActivity extends AppCompatActivity {
                 // 若 取消請求 則 grantResults
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // 可將資料儲存至外部儲存裝置
+                    // 將資料儲存至 私有外部公共 路徑
+                    File dir = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
+                    saveFile(dir);
                 }
                 return;
             }
         }
     }
 
+    private void saveFile(File dir) {
+        OutputStream os = null;
+        String fileName = "AppInfos";
+        List<AppInfo> list = AppInfo.generateSampleList(getPackageManager());
 
-    private boolean mediaMounted() {
-        String state = Environment.getExternalStorageState();
-        return state.equals(Environment.MEDIA_MOUNTED);
+        try {
+            // 檢查目錄是否存在
+            if (!dir.exists()) {
+                // 建立目錄
+                if (!dir.mkdirs()) {
+                    Toast.makeText(this, "無法建立目錄", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+
+            File file = new File(dir, fileName);
+            os = new FileOutputStream(file);
+
+            StringBuilder sb = new StringBuilder();
+
+            for ( AppInfo info : list ) {
+                //os.write(info.getName().getBytes());
+                sb.append(info.getName()+"\n");
+            }
+
+            os.write(sb.toString().getBytes());
+
+            Toast.makeText(this, "儲存完畢，路徑為: " + dir, Toast.LENGTH_LONG).show();
+
+        } catch (IOException e) {
+            Log.e(TAG, e.toString());
+
+        } finally {
+            try {
+                if (os != null) {
+                    os.close();
+                }
+
+            } catch (IOException e) {
+                Log.e(TAG, e.toString());
+            }
+
+        }
     }
+
+
+
 }
 
