@@ -137,16 +137,19 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE:{
-                // 若 取消請求 則 grantResults
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // 將資料儲存至 私有外部公共 路徑
-                    File dir = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
-                    saveFile(dir, "AppInfos");
+            case MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE:
+                {
+                    // 若 取消請求 則 grantResults
+                    if (grantResults.length > 0
+                            && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        // 將資料儲存至 私有外部公共 路徑
+                        File dir = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
+                        saveFile(dir, "AppInfos");
+                    }
                 }
-                return;
-            }
+                break;
+            default:
+                break;
         }
     }
 
@@ -169,7 +172,8 @@ public class MainActivity extends AppCompatActivity {
 
             for ( AppInfo info : list ) {
                 //os.write(info.getName().getBytes());
-                sb.append(info.getName()+"\n");
+                sb.append(info.getName());
+                sb.append("\n");
             }
             os.write(sb.toString().getBytes());
 

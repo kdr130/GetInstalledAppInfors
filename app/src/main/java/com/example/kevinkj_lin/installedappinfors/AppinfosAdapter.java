@@ -11,13 +11,13 @@ import android.widget.Toast;
 
 import java.util.List;
 
-public class AppinfosAdapter extends RecyclerView.Adapter<AppinfosAdapter.ViewHolder> {
+class AppinfosAdapter extends RecyclerView.Adapter<AppinfosAdapter.ViewHolder> {
     // ViewHolder 為 item layout
-    public static class ViewHolder extends RecyclerView.ViewHolder{
-        public TextView appNameTextView;
-        public ImageView appIconTextView;
+    static class ViewHolder extends RecyclerView.ViewHolder{
+        private TextView appNameTextView;
+        private ImageView appIconTextView;
 
-        public ViewHolder(View itemView){
+        ViewHolder(View itemView){
             super(itemView);
 
             appNameTextView = (TextView) itemView.findViewById(R.id.tv_name);
@@ -41,7 +41,7 @@ public class AppinfosAdapter extends RecyclerView.Adapter<AppinfosAdapter.ViewHo
 
     private List<AppInfo> mAppInfos;
 
-    public AppinfosAdapter(List<AppInfo> appInfos){
+    AppinfosAdapter(List<AppInfo> appInfos){
         mAppInfos = appInfos;
     }
 

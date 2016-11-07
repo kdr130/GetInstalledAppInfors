@@ -15,11 +15,11 @@ import java.util.List;
  *  icon: App 的圖示
  */
 
-public class AppInfo {
+class AppInfo {
     private String name;
     private Drawable icon;
 
-    public AppInfo() {
+    AppInfo() {
     }
 
     public String getName() {
@@ -39,7 +39,7 @@ public class AppInfo {
     }
 
     // 根據傳入的 PackageManager 取得目前 使用者所安裝的 APP 資料
-    public static List<AppInfo> generateSampleList(PackageManager pm){
+    static List<AppInfo> generateSampleList(PackageManager pm){
         // 用來儲存 使用者安裝的 APP 資訊
         List<AppInfo> appInfos = new ArrayList<>();
         // 取得目前 所有 APP 的資訊(包括 系統 APP 以及 使用者所安裝的 APP)
